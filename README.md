@@ -1,5 +1,5 @@
 # html-live-editor
-A lite HTML editor with live preview
+A lite HTML editor with live preview, with custom css and js code for preview and support rtl languages!
 
 # Usage
 
@@ -19,5 +19,18 @@ A lite HTML editor with live preview
 ```bash
 <script>
 $('.myeditor').LiveEditor(); 
+</script>
+```
+
+# Advance Usage
+thies configs are available:
+```bash
+<script>
+$('.myeditor').LiveEditor({
+			preview_head_additional_code: '',
+			height:'300',
+			preview_refresh_rate:5000,
+			language:'en'
+		}); 
 </script>
 ```

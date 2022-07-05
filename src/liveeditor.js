@@ -50,6 +50,7 @@ class LiveEditorClass{
 
 		this.initConfig(_config);
 		this.lang = new LiveEditorLang(this.config.language)
+		this.validator = new LiveEditorValidator()
 		this.init();
 	}
 
@@ -85,6 +86,12 @@ class LiveEditorClass{
 			//this.preview_obj.contents().append(this.old);
 			var $iframe = $('#p' + this.wrap_obj_name);
 			var $oldVar = this.old;
+			var checkValidate = this.validator.validate($oldVar);
+			if(checkValidate)
+				$iframe.removeClass("html-validate-error");
+			else
+				$iframe.addClass("html-validate-error");
+			$("." + this.wrap_obj_name + " .tools-error").text(this.lang.get(this.validator.error));
 			$iframe.ready(function() {
 			    $iframe.contents().find("body").html($oldVar);
 			});			
@@ -97,11 +104,40 @@ class LiveEditorClass{
 		if($("style[data-n-head=25626548]")[0]) return;
 		let cssCode = '';
 		cssCode += '<style data-n-head="25626548">';
-		cssCode += '.liveeditor-wrap{display: block;width:100%;border:1px solid black;}';
+		cssCode += '.liveeditor-wrap{display: block;width:100%;	color: #555;background-color: #fff;background-image: none;border: 1px solid #ccc;border-radius: 3px;-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);-webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;-o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;}';
 		cssCode += '.liveeditor-tools{display: block;width:100%;margin:10px}';
 		cssCode += '.liveeditor-box{display: flex;width:100%;}';
-		cssCode += '.liveeditor{width:50%;height:' + this.config.height + 'px}';
-		cssCode += '.liveeditor-preview{width:50%;border:1px solid;}';
+		cssCode += '.liveeditor{width:50%;margin:5px;height:' + this.config.height + 'px}';
+		cssCode += '.liveeditor-preview{width:50%;margin:5px;border:1px solid;}';
+		cssCode += '.html-validate-error{border:1px solid red;}';
+		cssCode += `.liveeditor-wrap .tools-insert-code {
+			background-color: #fff;
+			border-width: 1px;
+			color: #363636;
+			cursor: pointer;
+			justify-content: center;
+			padding-bottom: calc(.5em - 1px);
+			padding-left: 1em;
+			padding-right: 1em;
+			padding-top: calc(.5em - 1px);
+			text-align: center;
+			white-space: nowrap;
+			background-color: #eff5fb;
+			color: #296fa8;
+			border-color: transparent;
+			line-height: 1.5;
+			position: relative;
+			display: inline-flex;
+			box-shadow: none;
+			border-radius: .375em;
+			border: 1px solid transparent;
+			-webkit-appearance: none;	
+			margin-left:5px;		
+		}`;
+		cssCode += `.liveeditor-wrap .tools-error {
+			margin-right:10px;
+			color: red;
+		}`;		
 		cssCode += '</style>';
 		document.head.innerHTML += cssCode;
 	}
@@ -116,9 +152,15 @@ class LiveEditorClass{
 
 	getToolsBox(){
 		var html = '';
-		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h1>\nnew\n</h1>\n">' + this.lang.get("addh1") + '</button>';
-		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h2>\nnew\n</h2>\n">' + this.lang.get("addh2") + '</button>';
-
+		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<br>\n">' + this.lang.get("add_br") + '</button>';
+		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h1>\nyour_text\n</h1>\n">' + this.lang.get("add_h1") + '</button>';
+		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h2>\nyour_text\n</h2>\n">' + this.lang.get("add_h2") + '</button>';
+		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h3>\nyour_text\n</h3>\n">' + this.lang.get("add_h3") + '</button>';
+		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<p>\nyour_text\n</p>\n">' + this.lang.get("add_p") + '</button>';
+		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<b>\nyour_text\n</b>\n">' + this.lang.get("add_b") + '</button>';
+		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<img src=\'your_url\' width=\'200\' height=\'200\'>\n">' + this.lang.get("add_img") + '</button>';
+		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<a href=\'your_url\'>\nyour_text\n</a>\n">' + this.lang.get("add_link") + '</button>';
+		html += '<span class="tools-error"></span>';
 		return html;
 	}
 	
@@ -146,17 +188,44 @@ class LiveEditorLang{
 
 	init_en(){
 		const _l = [];
-		_l["addh1"] = "Add H1";
-		_l["addh2"] = "Add H2";
-		_l["addh3"] = "Add H3";
-		_l["addb"] = "Add B";
-		_l["addimg"] = "Add IMG";
+		_l["add_br"] = "New Line";
+		_l["add_h1"] = "Add H1";
+		_l["add_h2"] = "Add H2";
+		_l["add_h3"] = "Add H3";
+		_l["add_p"] = "Add P";
+		_l["add_b"] = "Add B";
+		_l["add_img"] = "Add IMG";
+		_l["add_link"] = "Add LINK";
+		_l["open_tags_are_not_closed"] = "Open tags are not closed.";
 		this.arr["en"] = _l;
 	}	
 
 	init_fa(){
 		const _l = [];
-		_l["addh1"] = "اضافه کردن H1";
+		_l["add_br"] = "اضافه کردن خط جدید";
+		_l["add_h1"] = "اضافه کردن H1";
+		_l["add_h2"] = "اضافه کردن H2";
+		_l["add_h3"] = "اضافه کردن H3";
+		_l["add_p"] = "پاراگراف جدید";
+		_l["add_b"] = "اضافه کردن B";
+		_l["add_img"] = "عکس جدید";	
+		_l["add_link"] = "لینک جدید";
+		_l["open_tags_are_not_closed"] = "تگ های باز شده بسته نشده اند.";	
 		this.arr["fa"] = _l;
 	}		
+}
+
+class LiveEditorValidator{
+	constructor(){
+		this.error = '';
+	}	
+
+	validate(content){
+		if(content == ''){
+			this.error = '';
+			return true;
+		}
+		this.error = 'open_tags_are_not_closed';
+		return false;
+	}
 }
