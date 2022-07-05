@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="rtl">
 
 <head>
   <meta name="description" content="Webpage description goes here" />
@@ -24,7 +24,10 @@
 
 	<script>
 		
-		$('.myeditor').LiveEditor();  
+		$('.myeditor').LiveEditor({
+			preview_head_additional_code: '<style>body {direction:rtl;}</style>',
+			language:'fa'
+		});  
 		
 		//$('.myeditor').LiveEditor();
 	</script>
