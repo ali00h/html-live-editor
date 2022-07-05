@@ -15,17 +15,20 @@
 <body>
   
 	<div class="container">
-		myform:
+		description:
 		<textarea class="myeditor"></textarea>
-		<p>salam</p>
-		myform2:
-		<textarea class="myeditor1"></textarea>
+		<p>Please fill this form:</p>
+		comment:
+		<textarea class="myeditor"></textarea>
 	</div>
 
 	<script>
-	$('.myeditor').LiveEditor();  
-	
-	$('.myeditor1').LiveEditor();  
+		
+		$('.myeditor').LiveEditor({
+			preview_head_additional_code: '<style>body {direction:rtl;}</style>'
+		});  
+		
+		//$('.myeditor').LiveEditor();
 	</script>
 
 </body>
