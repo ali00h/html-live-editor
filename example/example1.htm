@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+
+<head>
+  <meta name="description" content="Webpage description goes here" />
+  <meta charset="utf-8">
+  <title>Live Editor Example1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+  <script src="../src/liveeditor.js"></script>
+</head>
+
+<body>
+  
+	<div class="container">
+		myform:
+		<textarea class="myeditor"></textarea>
+		<p>salam</p>
+		myform2:
+		<textarea class="myeditor1"></textarea>
+	</div>
+
+	<script>
+	$('.myeditor').LiveEditor();  
+	
+	$('.myeditor1').LiveEditor();  
+	</script>
+
+</body>
+</html>
