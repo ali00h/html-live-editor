@@ -17,5 +17,7 @@ A lite HTML editor with live preview
 ```
 4-Mention your textarea to use LiveEditor
 ```bash
+<script>
 $('.myeditor').LiveEditor(); 
+</script>
 ```
