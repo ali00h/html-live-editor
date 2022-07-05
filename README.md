@@ -23,7 +23,7 @@ $('.myeditor').LiveEditor();
 ```
 
 # Advance Usage
-thies configs are available:
+These configs are available:
 ```bash
 <script>
 $('.myeditor').LiveEditor({
