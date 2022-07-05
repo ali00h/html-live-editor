@@ -1,7 +1,7 @@
 # html-live-editor
 A lite HTML editor with live preview
 
-$ Usage
+# Usage
 
 1-Add jquery in your page
 ```bash
