@@ -142,6 +142,7 @@ class LiveEditorClass{
 		}`;
 		cssCode += `.liveeditor-wrap .tools-error {
 			margin-right:10px;
+			margin-left:10px;
 			color: red;
 			direction: ltr;
 			display: inline;
@@ -234,6 +235,13 @@ class LiveEditorValidator{
 		}
 
 		let _validator = this.validHTML(content);
+
+		if(_validator){
+			let existEmptyTag = this.findEmptyTags(content);
+			console.log("existEmptyTag: " + existEmptyTag);
+			_validator = !(existEmptyTag);
+		}
+
 		if(_validator) this.error = '';
 		return _validator;
 	}
@@ -297,4 +305,31 @@ class LiveEditorValidator{
 		doc.innerHTML = html;
 		return ( doc.innerHTML === html );
 	}	
+
+	findEmptyTags(str){
+		const regex = /<([^>]+)\s*([^>]*)>\s*<\/\1\s*>/gm;
+
+		let m;
+		var $res_finded = false;
+		var $res_error = '';
+
+		while ((m = regex.exec(str)) !== null) {
+			// This is necessary to avoid infinite loops with zero-width matches
+			if (m.index === regex.lastIndex) {
+				regex.lastIndex++;
+			}
+			
+			// The result can be accessed through the `m`-variable.
+			m.forEach((match, groupIndex) => {
+				console.log(groupIndex + " " + match);
+				if(groupIndex == 0){
+					$res_error = match;
+					$res_finded = true;
+				}  
+			});
+		}		
+
+		this.error = "Empty Tag: " + $res_error;
+		return $res_finded;
+	}
 }
