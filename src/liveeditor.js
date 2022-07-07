@@ -38,7 +38,20 @@ $( document ).ready(function() {
 		//console.log(mainObj);
 		//console.log($("." + mainObj + " .liveeditor").val());
 		$("." + mainObj + " .liveeditor").insertAtCaret(appendData)
-	});			
+	});	
+	$("button.tools-change-direction").on("click", function() {
+		let mainObj = $(this).data("mainObj");
+		let objText = $("." + mainObj + " .liveeditor");
+		if(objText.hasClass("ltr-direction")){
+			objText.addClass("rtl-direction");
+			objText.removeClass("ltr-direction");
+		}else{
+			objText.addClass("ltr-direction");
+			objText.removeClass("rtl-direction");			
+		}
+		
+	});		
+	
 });
 
 
@@ -69,6 +82,7 @@ class LiveEditorClass{
 		this.old = '';
 
 		this.addCSS();
+		this.obj.val(this.getHtmlBeautifier(this.obj.val()));
 		this.obj.addClass("liveeditor");
 		this.obj.wrap('<div class="liveeditor-wrap ' + this.wrap_obj_name + '"></div>');
 		this.obj.wrap('<div class="liveeditor-box"></div>');
@@ -108,6 +122,8 @@ class LiveEditorClass{
 		cssCode += '.liveeditor-tools{display: block;width:100%;margin:10px}';
 		cssCode += '.liveeditor-box{display: flex;width:100%;}';
 		cssCode += '.liveeditor{width:50%;color: #545454;border: 1px solid #a9a9a9;border-radius: 6px;margin:5px;height:' + this.config.height + 'px}';
+		cssCode += '.ltr-direction{direction:ltr;}';
+		cssCode += '.rtl-direction{direction:rtl;}';
 		cssCode += `.liveeditor-preview{
 			width:50%;
 			margin:5px;
@@ -116,7 +132,7 @@ class LiveEditorClass{
 			box-shadow: 0 .5em 1em 1px rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02);
 		}`;
 		cssCode += '.html-validate-error{border:1px solid red;}';
-		cssCode += `.liveeditor-wrap .tools-insert-code {
+		cssCode += `.liveeditor-wrap .liveeditor-tools button {
 			background-color: #fff;
 			border-width: 1px;
 			color: #363636;
@@ -162,6 +178,7 @@ class LiveEditorClass{
 
 	getToolsBox(){
 		var html = '';
+		html += '<button class="tools-change-direction" data-main-obj="' + this.wrap_obj_name + '">' + this.lang.get("change_dir") + '</button>';
 		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<br>\n">' + this.lang.get("add_br") + '</button>';
 		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h1>\nyour_text\n</h1>\n">' + this.lang.get("add_h1") + '</button>';
 		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h2>\nyour_text\n</h2>\n">' + this.lang.get("add_h2") + '</button>';
@@ -173,6 +190,26 @@ class LiveEditorClass{
 		html += '<div class="tools-error"></div>';
 		return html;
 	}
+
+	getHtmlBeautifier(html) {
+		var tab = '\t';
+		var result = '';
+		var indent= '';
+	
+		html.split(/>\s*</).forEach(function(element) {
+			if (element.match( /^\/\w/ )) {
+				indent = indent.substring(tab.length);
+			}
+	
+			result += indent + '<' + element + '>\r\n';
+	
+			if (element.match( /^<?\w[^>]*[^\/]$/ ) && !element.startsWith("input")  ) { 
+				indent += tab;              
+			}
+		});
+	
+		return result.substring(1, result.length-3);
+	}	
 	
 }
 
@@ -197,7 +234,8 @@ class LiveEditorLang{
 	}
 
 	init_en(){
-		const _l = [];
+		const _l = [];		
+		_l["change_dir"] = "Change Direction";
 		_l["add_br"] = "New Line";
 		_l["add_h1"] = "Add H1";
 		_l["add_h2"] = "Add H2";
@@ -211,6 +249,7 @@ class LiveEditorLang{
 
 	init_fa(){
 		const _l = [];
+		_l["change_dir"] = "تغییر جهت صفحه";
 		_l["add_br"] = "اضافه کردن خط جدید";
 		_l["add_h1"] = "اضافه کردن H1";
 		_l["add_h2"] = "اضافه کردن H2";
