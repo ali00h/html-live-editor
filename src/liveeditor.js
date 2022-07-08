@@ -145,6 +145,7 @@ class LiveEditorClass{
 			box-shadow: 0 .5em 1em 1px rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02);
 		}`;
 		cssCode += '.html-validate-error{border:1px solid red;}';
+		cssCode += `.liveeditor-wrap .liveeditor-tools a.bt {font-size:10pt;line-height:1.2;}`;
 		cssCode += `.liveeditor-wrap .liveeditor-tools .bt {
 			background-color: #fff;
 			border-width: 1px;
@@ -206,7 +207,9 @@ class LiveEditorClass{
 		
 		for (let j = 0; j < this.config.additional_tools.length; j++) {
 			let add_tool = this.config.additional_tools[j];
-			component_arr.splice(add_tool.index, 0, add_tool.obj);
+			let add_tool_obj = add_tool.obj;
+			add_tool_obj = add_tool_obj.replace("wrap_obj_name",this.wrap_obj_name);
+			component_arr.splice(add_tool.index, 0, add_tool_obj);
 		}
 
 		var html = '';
@@ -293,7 +296,7 @@ class LiveEditorValidator{
 	}	
 
 	validate(content){
-		if(content == ''){
+		if(content.trim() == ''){
 			this.error = '';
 			return true;
 		}
