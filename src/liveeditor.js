@@ -37,6 +37,18 @@ $( document ).ready(function() {
 		let appendData = $(this).data("appendData");
 		//console.log(mainObj);
 		//console.log($("." + mainObj + " .liveeditor").val());
+		let your_img_url = $("." + mainObj + " .liveeditor-tools input[name='image']").val();
+		if(your_img_url != undefined && your_img_url != ''){
+			console.log(your_img_url);
+			appendData = appendData.replace("your_img_url",your_img_url);
+		}
+
+		let your_url = $("." + mainObj + " .liveeditor-tools input[name='url']").val();
+		if(your_url != undefined && your_url != ''){
+			console.log(your_url);
+			appendData = appendData.replace("your_url",your_url);
+		}		
+
 		$("." + mainObj + " .liveeditor").insertAtCaret(appendData)
 	});	
 	$("button.tools-change-direction").on("click", function() {
@@ -72,7 +84,8 @@ class LiveEditorClass{
 			preview_head_additional_code: '',
 			height:'400',
 			preview_refresh_rate:1000,
-			language:'en'
+			language:'en',
+			additional_tools:[]
 		};
 		this.config = { ...configDefault, ..._config }
 		//console.log(this.config);
@@ -122,8 +135,8 @@ class LiveEditorClass{
 		cssCode += '.liveeditor-tools{display: block;width:100%;margin:10px}';
 		cssCode += '.liveeditor-box{display: flex;width:100%;}';
 		cssCode += '.liveeditor{width:50%;color: #545454;border: 1px solid #a9a9a9;border-radius: 6px;margin:5px;height:' + this.config.height + 'px}';
-		cssCode += '.ltr-direction{direction:ltr;}';
-		cssCode += '.rtl-direction{direction:rtl;}';
+		cssCode += '.ltr-direction{direction:ltr !important;}';
+		cssCode += '.rtl-direction{direction:rtl !important;}';
 		cssCode += `.liveeditor-preview{
 			width:50%;
 			margin:5px;
@@ -132,7 +145,7 @@ class LiveEditorClass{
 			box-shadow: 0 .5em 1em 1px rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02);
 		}`;
 		cssCode += '.html-validate-error{border:1px solid red;}';
-		cssCode += `.liveeditor-wrap .liveeditor-tools button {
+		cssCode += `.liveeditor-wrap .liveeditor-tools .bt {
 			background-color: #fff;
 			border-width: 1px;
 			color: #363636;
@@ -177,17 +190,29 @@ class LiveEditorClass{
 	}
 
 	getToolsBox(){
+		var component_arr = [];
+		
+		component_arr.push('<button type="button" class="bt tools-change-direction" data-main-obj="' + this.wrap_obj_name + '">' + this.lang.get("change_dir") + '</button>');
+		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<br>\n">' + this.lang.get("add_br") + '</button>');
+		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h1>\nyour_text\n</h1>\n">' + this.lang.get("add_h1") + '</button>');
+		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h2>\nyour_text\n</h2>\n">' + this.lang.get("add_h2") + '</button>');
+		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h3>\nyour_text\n</h3>\n">' + this.lang.get("add_h3") + '</button>');
+		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<p>\nyour_text\n</p>\n">' + this.lang.get("add_p") + '</button>');
+		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<b>\nyour_text\n</b>\n">' + this.lang.get("add_b") + '</button>');		
+		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<a href=\'your_url\'>\nyour_text\n</a>\n">' + this.lang.get("add_link") + '</button>');
+		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<img src=\'your_img_url\' width=\'200\' height=\'200\'>\n">' + this.lang.get("add_img") + '</button>');
+		component_arr.push('<div class="tools-error"></div>');
+		
+		
+		for (let j = 0; j < this.config.additional_tools.length; j++) {
+			let add_tool = this.config.additional_tools[j];
+			component_arr.splice(add_tool.index, 0, add_tool.obj);
+		}
+
 		var html = '';
-		html += '<button class="tools-change-direction" data-main-obj="' + this.wrap_obj_name + '">' + this.lang.get("change_dir") + '</button>';
-		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<br>\n">' + this.lang.get("add_br") + '</button>';
-		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h1>\nyour_text\n</h1>\n">' + this.lang.get("add_h1") + '</button>';
-		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h2>\nyour_text\n</h2>\n">' + this.lang.get("add_h2") + '</button>';
-		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h3>\nyour_text\n</h3>\n">' + this.lang.get("add_h3") + '</button>';
-		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<p>\nyour_text\n</p>\n">' + this.lang.get("add_p") + '</button>';
-		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<b>\nyour_text\n</b>\n">' + this.lang.get("add_b") + '</button>';
-		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<img src=\'your_url\' width=\'200\' height=\'200\'>\n">' + this.lang.get("add_img") + '</button>';
-		html += '<button class="tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<a href=\'your_url\'>\nyour_text\n</a>\n">' + this.lang.get("add_link") + '</button>';
-		html += '<div class="tools-error"></div>';
+		for (let i = 0; i < component_arr.length; i++) {
+			html += component_arr[i];
+		}		
 		return html;
 	}
 
@@ -235,29 +260,29 @@ class LiveEditorLang{
 
 	init_en(){
 		const _l = [];		
-		_l["change_dir"] = "Change Direction";
-		_l["add_br"] = "New Line";
-		_l["add_h1"] = "Add H1";
-		_l["add_h2"] = "Add H2";
-		_l["add_h3"] = "Add H3";
-		_l["add_p"] = "Add P";
-		_l["add_b"] = "Add B";
-		_l["add_img"] = "Add IMG";
-		_l["add_link"] = "Add LINK";
+		_l["change_dir"] = "Dir";
+		_l["add_br"] = "Br";
+		_l["add_h1"] = "H1";
+		_l["add_h2"] = "H2";
+		_l["add_h3"] = "H3";
+		_l["add_p"] = "P";
+		_l["add_b"] = "B";
+		_l["add_img"] = "Add Img";
+		_l["add_link"] = "link";
 		this.arr["en"] = _l;
 	}	
 
 	init_fa(){
 		const _l = [];
-		_l["change_dir"] = "تغییر جهت صفحه";
-		_l["add_br"] = "اضافه کردن خط جدید";
-		_l["add_h1"] = "اضافه کردن H1";
-		_l["add_h2"] = "اضافه کردن H2";
-		_l["add_h3"] = "اضافه کردن H3";
-		_l["add_p"] = "پاراگراف جدید";
-		_l["add_b"] = "اضافه کردن B";
-		_l["add_img"] = "عکس جدید";	
-		_l["add_link"] = "لینک جدید";
+		_l["change_dir"] = "Dir";
+		_l["add_br"] = "Br";
+		_l["add_h1"] = "H1";
+		_l["add_h2"] = "H2";
+		_l["add_h3"] = "H3";
+		_l["add_p"] = "P";
+		_l["add_b"] = "B";
+		_l["add_img"] = "Add Img";
+		_l["add_link"] = "link";
 		this.arr["fa"] = _l;
 	}		
 }
