@@ -35,12 +35,13 @@ $( document ).ready(function() {
 	$("button.tools-insert-code").on("click", function() {
 		let mainObj = $(this).data("mainObj");
 		let appendData = $(this).data("appendData");
-		//console.log(mainObj);
+		let le_config = $("." + mainObj + " .liveeditor").data('config');;
+		//console.log(le_config);
 		//console.log($("." + mainObj + " .liveeditor").val());
 		let your_img_url = $("." + mainObj + " .liveeditor-tools input[name='image']").val();
 		if(your_img_url != undefined && your_img_url != ''){
 			console.log(your_img_url);
-			appendData = appendData.replace("your_img_url",your_img_url);
+			appendData = appendData.replace("your_img_url",le_config.image_url_prefix + your_img_url);
 		}
 
 		let your_url = $("." + mainObj + " .liveeditor-tools input[name='url']").val();
@@ -85,7 +86,8 @@ class LiveEditorClass{
 			height:'400',
 			preview_refresh_rate:1000,
 			language:'en',
-			additional_tools:[]
+			additional_tools:[],
+			image_url_prefix:''
 		};
 		this.config = { ...configDefault, ..._config }
 		//console.log(this.config);
@@ -101,7 +103,7 @@ class LiveEditorClass{
 		this.obj.wrap('<div class="liveeditor-box"></div>');
 		this.obj.parent().append("<iframe class='liveeditor-preview' id='p" + this.wrap_obj_name + "'></iframe>");	
 		$('.' + this.wrap_obj_name).prepend("<div class='liveeditor-tools'>" + this.getToolsBox() + "</div>");	
-
+		this.obj.data('config', this.config);
 		this.addIframeHead();
 		this.update();
 	}
@@ -216,6 +218,7 @@ class LiveEditorClass{
 		for (let i = 0; i < component_arr.length; i++) {
 			html += component_arr[i];
 		}		
+		
 		return html;
 	}
 
@@ -296,7 +299,7 @@ class LiveEditorValidator{
 	}	
 
 	validate(content){
-		if(content.trim() == ''){
+		if(content.trim() == '' || !this.isHtml(content.trim())){
 			this.error = '';
 			return true;
 		}
@@ -312,6 +315,10 @@ class LiveEditorValidator{
 		if(_validator) this.error = '';
 		return _validator;
 	}
+
+	isHtml(input) {
+		return /<[a-z]+\d?(\s+[\w-]+=("[^"]*"|'[^']*'))*\s*\/?>|&#?\w+;/i.test(input);
+	}	
 
 	validHTML(html) { // checks the validity of html, requires all tags and property-names to only use alphabetical characters and numbers (and hyphens, underscore for properties)
 		html = html.toLowerCase().replace(/(?<=<[^>]+?=\s*"[^"]*)[<>]/g,"").replace(/(?<=<[^>]+?=\s*'[^']*)[<>]/g,""); // remove all angle brackets from tag properties
