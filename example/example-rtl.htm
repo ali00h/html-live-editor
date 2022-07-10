@@ -2,13 +2,28 @@
 <html lang="en" dir="rtl">
 
 <head>
-  <meta name="description" content="Webpage description goes here" />
-  <meta charset="utf-8">
-  <title>Live Editor Example1</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="author" content="">
-  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-  <script src="../src/liveeditor.js"></script>
+	<meta name="description" content="Webpage description goes here" />
+	<meta charset="utf-8">
+	<title>Live Editor Example1</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="author" content="">
+	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script src="../src/liveeditor.js"></script>
+	<script>
+	$( document ).ready(function() {		
+		$('.myeditor').LiveEditor({
+			preview_head_additional_code: '<style>body {direction:rtl;}</style>',
+			language:'fa',
+			additional_tools: [
+				{index:8,obj: '<a href="" data-toggle="image" class="img-thumbnail bt"><img src="" alt="" title="" data-placeholder="" width="25" height="12" /> Select Img</a><input type="hidden" name="image" value="" />'},
+				{index:7,obj: '<button type="button" class="bt tools-insert-code" data-main-obj="wrap_obj_name" data-append-data="\n<b class=\'highlight\'>\n<a href=\'your_url\'>\nyour_text\n</a>\n</b>\n">Highlight Link</button>'}
+			],
+			image_url_prefix : 'https://www.google.com/'
+		});  
+	});
+	</script>
+
+
 </head>
 
 <body>
@@ -23,20 +38,6 @@
 		<textarea class="myeditor"><h1>hiiii</h1></textarea>
 	</div>
 
-	<script>
-		
-		$('.myeditor').LiveEditor({
-			preview_head_additional_code: '<style>body {direction:rtl;}</style>',
-			language:'fa',
-			additional_tools: [
-				{index:8,obj: '<a href="" data-toggle="image" class="img-thumbnail bt"><img src="" alt="" title="" data-placeholder="" width="25" height="12" /> Select Img</a><input type="hidden" name="image" value="" />'},
-				{index:7,obj: '<button type="button" class="bt tools-insert-code" data-main-obj="wrap_obj_name" data-append-data="\n<b class=\'highlight\'>\n<a href=\'your_url\'>\nyour_text\n</a>\n</b>\n">Highlight Link</button>'}
-			],
-			image_url_prefix : 'https://www.google.com/'
-		});  
-		
-		//$('.myeditor').LiveEditor();
-	</script>
 
 </body>
 </html>

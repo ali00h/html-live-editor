@@ -1,38 +1,38 @@
-$.fn.LiveEditor = function(config){
-    this.each(function(index){
-		let newLiveEditor = new LiveEditorClass($(this),index,config);
-    });    
-};
-
-$.fn.extend({
-	insertAtCaret: function(myValue) {
-	  this.each(function() {
-		if (document.selection) {
-		  this.focus();
-		  var sel = document.selection.createRange();
-		  sel.text = myValue;
-		  this.focus();
-		} else if (this.selectionStart || this.selectionStart == '0') {
-		  var startPos = this.selectionStart;
-		  var endPos = this.selectionEnd;
-		  var scrollTop = this.scrollTop;
-		  this.value = this.value.substring(0, startPos) +
-			myValue + this.value.substring(endPos,this.value.length);
-		  this.focus();
-		  this.selectionStart = startPos + myValue.length;
-		  this.selectionEnd = startPos + myValue.length;
-		  this.scrollTop = scrollTop;
-		} else {
-		  this.value += myValue;
-		  this.focus();
-		}
-	  });
-	  return this;
-	}
-});
-
 $( document ).ready(function() {
-	$("button.tools-insert-code").on("click", function() {
+	$.fn.LiveEditor = function(config){
+		this.each(function(index){
+			let newLiveEditor = new LiveEditorClass($(this),index,config);
+		});    
+	};
+
+	$.fn.extend({
+		insertAtCaret: function(myValue) {
+		this.each(function() {
+			if (document.selection) {
+			this.focus();
+			var sel = document.selection.createRange();
+			sel.text = myValue;
+			this.focus();
+			} else if (this.selectionStart || this.selectionStart == '0') {
+			var startPos = this.selectionStart;
+			var endPos = this.selectionEnd;
+			var scrollTop = this.scrollTop;
+			this.value = this.value.substring(0, startPos) +
+				myValue + this.value.substring(endPos,this.value.length);
+			this.focus();
+			this.selectionStart = startPos + myValue.length;
+			this.selectionEnd = startPos + myValue.length;
+			this.scrollTop = scrollTop;
+			} else {
+			this.value += myValue;
+			this.focus();
+			}
+		});
+		return this;
+		}
+	});
+
+	$(document).on('click', 'button.tools-insert-code', function () {
 		let mainObj = $(this).data("mainObj");
 		let appendData = $(this).data("appendData");
 		let le_config = $("." + mainObj + " .liveeditor").data('config');;
@@ -52,7 +52,7 @@ $( document ).ready(function() {
 
 		$("." + mainObj + " .liveeditor").insertAtCaret(appendData)
 	});	
-	$("button.tools-change-direction").on("click", function() {
+	$(document).on('click', 'button.tools-change-direction', function () {
 		let mainObj = $(this).data("mainObj");
 		let objText = $("." + mainObj + " .liveeditor");
 		if(objText.hasClass("ltr-direction")){
@@ -104,15 +104,16 @@ class LiveEditorClass{
 		this.obj.parent().append("<iframe class='liveeditor-preview' id='p" + this.wrap_obj_name + "'></iframe>");	
 		$('.' + this.wrap_obj_name).prepend("<div class='liveeditor-tools'>" + this.getToolsBox() + "</div>");	
 		this.obj.data('config', this.config);
-		this.addIframeHead();
+		//this.addIframeHead();
 		this.update();
 	}
 	
 	update(){
-		
+
 		if (this.old != this.obj.val()) {
 			this.old = this.obj.val();
 			//this.preview_obj.contents().append(this.old);
+			
 			var $iframe = $('#p' + this.wrap_obj_name);
 			var $oldVar = this.old;
 			var checkValidate = this.validator.validate($oldVar);
@@ -121,9 +122,15 @@ class LiveEditorClass{
 			else
 				$iframe.addClass("html-validate-error");
 			$("." + this.wrap_obj_name + " .tools-error").text(this.validator.error);
+			//console.log($oldVar);
+			/*
 			$iframe.ready(function() {
 			    $iframe.contents().find("body").html($oldVar);
 			});			
+			*/
+			var html_string = "<!DOCTYPE html><html><head><meta data-n-head='1' data-hid='charset' charset='utf-8'><meta data-n-head='1' name='viewport' content='width=device-width, initial-scale=1'>" + this.config.preview_head_additional_code + "</head><body>" + $oldVar  + "</body></html>";
+			document.querySelector('#p' + this.wrap_obj_name).srcdoc = html_string;
+			
 		}
 		
 		setTimeout(() => {this.update();}, this.config.preview_refresh_rate);
@@ -184,13 +191,6 @@ class LiveEditorClass{
 		document.head.innerHTML += cssCode;
 	}
 
-	addIframeHead(){
-		var $iframe = $('#p' + this.wrap_obj_name);
-		var $iframeHead = this.config.preview_head_additional_code;
-		$iframe.ready(function() {
-			$iframe.contents().find("head").html($iframeHead);
-		});				
-	}
 
 	getToolsBox(){
 		var component_arr = [];
@@ -202,6 +202,8 @@ class LiveEditorClass{
 		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h3>\nyour_text\n</h3>\n">' + this.lang.get("add_h3") + '</button>');
 		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<p>\nyour_text\n</p>\n">' + this.lang.get("add_p") + '</button>');
 		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<b>\nyour_text\n</b>\n">' + this.lang.get("add_b") + '</button>');		
+		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<pre>\nyour_text\n</pre>\n">' + this.lang.get("add_pre") + '</button>');	
+		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<ul>\n<li>\nyour_text\n</li>\n</ul>\n">' + this.lang.get("add_ul") + '</button>');	
 		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<a href=\'your_url\'>\nyour_text\n</a>\n">' + this.lang.get("add_link") + '</button>');
 		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<img src=\'your_img_url\' width=\'200\' height=\'200\'>\n">' + this.lang.get("add_img") + '</button>');
 		component_arr.push('<div class="tools-error"></div>');
@@ -275,6 +277,9 @@ class LiveEditorLang{
 		_l["add_b"] = "B";
 		_l["add_img"] = "Add Img";
 		_l["add_link"] = "link";
+		_l["add_pre"] = "Pre";
+		_l["add_ul"] = "Ul";
+		
 		this.arr["en"] = _l;
 	}	
 
@@ -289,6 +294,9 @@ class LiveEditorLang{
 		_l["add_b"] = "B";
 		_l["add_img"] = "Add Img";
 		_l["add_link"] = "link";
+		_l["add_pre"] = "Pre";
+		_l["add_ul"] = "Ul";
+
 		this.arr["fa"] = _l;
 	}		
 }
@@ -308,7 +316,7 @@ class LiveEditorValidator{
 
 		if(_validator){
 			let existEmptyTag = this.findEmptyTags(content);
-			console.log("existEmptyTag: " + existEmptyTag);
+			//console.log("existEmptyTag: " + existEmptyTag);
 			_validator = !(existEmptyTag);
 		}
 
@@ -395,7 +403,7 @@ class LiveEditorValidator{
 			
 			// The result can be accessed through the `m`-variable.
 			m.forEach((match, groupIndex) => {
-				console.log(groupIndex + " " + match);
+				//console.log(groupIndex + " " + match);
 				if(groupIndex == 0){
 					$res_error = match;
 					$res_finded = true;
