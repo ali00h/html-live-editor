@@ -122,19 +122,52 @@ class LiveEditorClass{
 			else
 				$iframe.addClass("html-validate-error");
 			$("." + this.wrap_obj_name + " .tools-error").text(this.validator.error);
-			//console.log($oldVar);
-			/*
-			$iframe.ready(function() {
-			    $iframe.contents().find("body").html($oldVar);
-			});			
-			*/
-			var html_string = "<!DOCTYPE html><html><head><meta data-n-head='1' data-hid='charset' charset='utf-8'><meta data-n-head='1' name='viewport' content='width=device-width, initial-scale=1'>" + this.config.preview_head_additional_code + "</head><body>" + $oldVar  + "</body></html>";
-			document.querySelector('#p' + this.wrap_obj_name).srcdoc = html_string;
+			var obj_iframe = document.querySelector('#p' + this.wrap_obj_name);
+			var obj_iframe_window = this.getIframeWindow(obj_iframe);//.getScrollPos();
+			var scr_pos = "0";
+			if(obj_iframe.srcdoc != ""){
+				scr_pos = obj_iframe_window.getScrollPos();
+				//console.log(scr_pos);
+			}
+			var html_string = "<!DOCTYPE html><html><head><meta data-n-head='1' data-hid='charset' charset='utf-8'><meta data-n-head='1' name='viewport' content='width=device-width, initial-scale=1'><script>function getScrollPos(){return (window.pageYOffset);}</script>" + this.config.preview_head_additional_code + "</head><body onLoad='window.scrollTo(0," + scr_pos + ")'>" + $oldVar  + "</body></html>";
+			
+			obj_iframe.srcdoc = html_string;
+
 			
 		}
 		
 		setTimeout(() => {this.update();}, this.config.preview_refresh_rate);
 	}
+
+	getIframeWindow(iframe_object) {
+		var doc;
+	  
+		if (iframe_object.contentWindow) {
+		  return iframe_object.contentWindow;
+		}
+	  
+		if (iframe_object.window) {
+		  return iframe_object.window;
+		} 
+	  
+		if (!doc && iframe_object.contentDocument) {
+		  doc = iframe_object.contentDocument;
+		} 
+	  
+		if (!doc && iframe_object.document) {
+		  doc = iframe_object.document;
+		}
+	  
+		if (doc && doc.defaultView) {
+		 return doc.defaultView;
+		}
+	  
+		if (doc && doc.parentWindow) {
+		  return doc.parentWindow;
+		}
+	  
+		return undefined;
+	}	
 	
 	addCSS(){
 		if($("style[data-n-head=25626548]")[0]) return;
