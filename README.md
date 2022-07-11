@@ -11,6 +11,11 @@ A lite HTML editor with live preview, with custom css and js code for preview an
 ```bash
 <script src="../src/liveeditor.js"></script>
 ```
+Or CDN:
+```bash
+<script src="https://cdn.jsdelivr.net/gh/ali00h/html-live-editor/src/liveeditor.js"></script>
+```
+
 3-Add a textarea in your body
 ```bash
 <textarea class="myeditor"></textarea>
