@@ -233,6 +233,7 @@ class LiveEditorClass{
 		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h1>\nyour_text\n</h1>\n">' + this.lang.get("add_h1") + '</button>');
 		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h2>\nyour_text\n</h2>\n">' + this.lang.get("add_h2") + '</button>');
 		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h3>\nyour_text\n</h3>\n">' + this.lang.get("add_h3") + '</button>');
+		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h4>\nyour_text\n</h4>\n">' + this.lang.get("add_h4") + '</button>');
 		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<p>\nyour_text\n</p>\n">' + this.lang.get("add_p") + '</button>');
 		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<b>\nyour_text\n</b>\n">' + this.lang.get("add_b") + '</button>');		
 		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<pre>\nyour_text\n</pre>\n">' + this.lang.get("add_pre") + '</button>');	
@@ -306,6 +307,7 @@ class LiveEditorLang{
 		_l["add_h1"] = "H1";
 		_l["add_h2"] = "H2";
 		_l["add_h3"] = "H3";
+		_l["add_h4"] = "H4";
 		_l["add_p"] = "P";
 		_l["add_b"] = "B";
 		_l["add_img"] = "Add Img";
@@ -323,6 +325,7 @@ class LiveEditorLang{
 		_l["add_h1"] = "H1";
 		_l["add_h2"] = "H2";
 		_l["add_h3"] = "H3";
+		_l["add_h4"] = "H4";
 		_l["add_p"] = "P";
 		_l["add_b"] = "B";
 		_l["add_img"] = "Add Img";
