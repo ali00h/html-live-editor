@@ -72,6 +72,7 @@ class LiveEditorClass{
 	constructor(_obj,_index,_config){
 		
 		this.obj = _obj
+		this.keyword_input = null;
 		this.wrap_obj_name = 'lv' + _index + '-' + Math.floor(Math.random() * 10000);
 
 		this.initConfig(_config);
@@ -87,7 +88,8 @@ class LiveEditorClass{
 			preview_refresh_rate:1000,
 			language:'en',
 			additional_tools:[],
-			image_url_prefix:''
+			image_url_prefix:'',
+			keyword_separator:','
 		};
 		this.config = { ...configDefault, ..._config }
 		//console.log(this.config);
@@ -105,6 +107,10 @@ class LiveEditorClass{
 		$('.' + this.wrap_obj_name).prepend("<div class='liveeditor-tools'>" + this.getToolsBox() + "</div>");	
 		this.obj.data('config', this.config);
 		//this.addIframeHead();
+		let keyword_input_attr = this.obj.attr('keyword-input');
+		if(keyword_input_attr){
+			this.keyword_input = $(keyword_input_attr);
+		}
 		this.update();
 	}
 	
@@ -129,7 +135,8 @@ class LiveEditorClass{
 				scr_pos = obj_iframe_window.getScrollPos();
 				//console.log(scr_pos);
 			}
-			var html_string = "<!DOCTYPE html><html><head><meta data-n-head='1' data-hid='charset' charset='utf-8'><meta data-n-head='1' name='viewport' content='width=device-width, initial-scale=1'><script>function getScrollPos(){return (window.pageYOffset);}</script>" + this.config.preview_head_additional_code + "</head><body onLoad='window.scrollTo(0," + scr_pos + ")'>" + $oldVar  + "</body></html>";
+			let keyword_report = this.getKeywordMetaInfo($oldVar);
+			var html_string = "<!DOCTYPE html><html><head><meta data-n-head='1' data-hid='charset' charset='utf-8'><meta data-n-head='1' name='viewport' content='width=device-width, initial-scale=1'><script>function getScrollPos(){return (window.pageYOffset);}</script>" + this.config.preview_head_additional_code + "</head><body onLoad='window.scrollTo(0," + scr_pos + ")'>" + keyword_report + $oldVar  + "</body></html>";
 			
 			obj_iframe.srcdoc = html_string;
 
@@ -276,7 +283,38 @@ class LiveEditorClass{
 		});
 	
 		return result.substring(1, result.length-3);
-	}	
+	}
+
+	getKeywordMetaInfo(content){
+		let report = [];
+		if(this.keyword_input != null) {
+			let keywords = this.keyword_input.val().split(this.config.keyword_separator);
+
+			for(let i=0 ; i < keywords.length ; i++){
+				let keyword_count = content.split(keywords[i]).length-1;
+				let item = new Object();
+				item["keyword"] = keywords[i];
+				item["count"] = keyword_count;
+				report.push(item);
+			}
+		}
+		let html = '';
+		if(report.length > 0){
+			html += '<div style="position: fixed;background-color: rgba(255, 255, 0, 0.7);padding: 5px;right: 0;bottom: 0;"><table>';
+			for(let p=0;p<report.length ; p++){
+				html += '<tr>';
+				html += '<td>';
+				html += report[p]["keyword"];
+				html += '</td>';
+				html += '<td>';
+				html += report[p]["count"];
+				html += '</td>';
+				html += '</tr>';
+			}
+			html += '</table></div>';
+		}
+		return html;
+	}
 	
 }
 

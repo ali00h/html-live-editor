@@ -30,6 +30,7 @@ $( document ).ready(function() {
 ```
 
 # Advance Usage
+## Config
 These configs are available:
 ```bash
 <script>
@@ -39,8 +40,14 @@ $( document ).ready(function() {
 			height:'300',
 			preview_refresh_rate:5000,
 			language:'en',
-			additional_tools: [{index:8,obj: '<button type="button" class="bt tools-insert-code" data-append-data="\n<ul><li>\nyour_text\n</li></ul>\n">UL</button>'}]
+			additional_tools: [{index:8,obj: '<button type="button" class="bt tools-insert-code" data-append-data="\n<ul><li>\nyour_text\n</li></ul>\n">UL</button>'}],
+			keyword_separator:','
 	}); 
 });		
 </script>
+```
+## Keyword Counter
+```bash
+<textarea class="myeditor" keyword-input=".mykeyword"></textarea>
+<input type="text" class="mykeyword" value="hi,test,about">
 ```
