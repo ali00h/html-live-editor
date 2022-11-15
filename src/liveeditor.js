@@ -286,6 +286,9 @@ class LiveEditorClass{
 	}
 
 	getKeywordMetaInfo(content){
+		let cleanText = content.replace(/<\/?[^>]+(>|$)/g, "");
+		let wordCount = cleanText.split(" ").length
+
 		let report = [];
 		if(this.keyword_input != null) {
 			let keywords = this.keyword_input.val().split(this.config.keyword_separator);
@@ -299,20 +302,20 @@ class LiveEditorClass{
 			}
 		}
 		let html = '';
+		html += '<div style="position: fixed;background-color: rgba(255, 255, 0, 0.7);width: 100%;padding: 5px;bottom: 0;">';
+		html += '<b>Characters: </b>' + cleanText.length;
+		html += ' <b>Words: </b>' + wordCount;
 		if(report.length > 0){
-			html += '<div style="position: fixed;background-color: rgba(255, 255, 0, 0.7);padding: 5px;right: 0;bottom: 0;"><table>';
+			html += '<br />';
 			for(let p=0;p<report.length ; p++){
-				html += '<tr>';
-				html += '<td>';
+				html += ' <b>';
 				html += report[p]["keyword"];
-				html += '</td>';
-				html += '<td>';
+				html += ': </b>';
 				html += report[p]["count"];
-				html += '</td>';
-				html += '</tr>';
 			}
-			html += '</table></div>';
+
 		}
+		html += '</div>';
 		return html;
 	}
 	
