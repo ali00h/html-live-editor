@@ -63,7 +63,19 @@ $( document ).ready(function() {
 			objText.removeClass("rtl-direction");			
 		}
 		
-	});		
+	});
+
+
+	$(document).on('mouseenter', 'button.tools-group-bt', function() {
+		//console.log('enter');
+		$('.tools-group').hide();
+		$(this).next().show();
+	});
+	$(document).on('mouseleave', 'div.tools-group-panel', function() {
+		//console.log('leave');
+		$('.tools-group').hide();
+	});
+
 	
 });
 
@@ -226,7 +238,23 @@ class LiveEditorClass{
 			direction: ltr;
 			display: inline;
 			text-align: left;
-		}`;		
+		}`;
+		cssCode += `.liveeditor-wrap .tools-group {
+			display: none;
+			position: absolute;
+			background-color: #ffffff;
+			border: 1px solid rgba(0, 0, 0, 0.2);
+			box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+			border-radius: 0px 0px 5px 5px;
+			margin: auto 5px;
+			min-width: 100px;
+			padding: 5px;
+		}`;
+		cssCode += `.liveeditor-wrap .tools-group-panel {
+			display:inline-block;
+		}`;
+
+
 		cssCode += '</style>';
 		document.head.innerHTML += cssCode;
 	}
@@ -235,18 +263,24 @@ class LiveEditorClass{
 	getToolsBox(){
 		var component_arr = [];
 		
-		component_arr.push('<button type="button" class="bt tools-change-direction" data-main-obj="' + this.wrap_obj_name + '">' + this.lang.get("change_dir") + '</button>');
-		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<br>\n">' + this.lang.get("add_br") + '</button>');
-		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h1>\nyour_text\n</h1>\n">' + this.lang.get("add_h1") + '</button>');
-		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h2>\nyour_text\n</h2>\n">' + this.lang.get("add_h2") + '</button>');
-		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h3>\nyour_text\n</h3>\n">' + this.lang.get("add_h3") + '</button>');
-		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h4>\nyour_text\n</h4>\n">' + this.lang.get("add_h4") + '</button>');
-		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<p>\nyour_text\n</p>\n">' + this.lang.get("add_p") + '</button>');
-		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<b>\nyour_text\n</b>\n">' + this.lang.get("add_b") + '</button>');		
-		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<pre>\nyour_text\n</pre>\n">' + this.lang.get("add_pre") + '</button>');	
-		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<ul>\n<li>\nyour_text\n</li>\n</ul>\n">' + this.lang.get("add_ul") + '</button>');	
-		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<a href=\'your_url\'>\nyour_text\n</a>\n">' + this.lang.get("add_link") + '</button>');
-		component_arr.push('<button type="button" class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<img src=\'your_img_url\' width=\'200\' height=\'200\'>\n">' + this.lang.get("add_img") + '</button>');
+		component_arr.push('<button  class="bt tools-change-direction" data-main-obj="' + this.wrap_obj_name + '">' + this.lang.get("change_dir") + '</button>');
+		component_arr.push('<div class="tools-group-panel"><button class="bt tools-group-bt">' + this.lang.get("format") + '</button><div class="tools-group">' +
+			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<br>\n">' + this.lang.get("add_br") + '</button>' +
+			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<p>\nyour_text\n</p>\n">' + this.lang.get("add_p") + '</button>' +
+			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<b>\nyour_text\n</b>\n">' + this.lang.get("add_b") + '</button>' +
+			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<pre>\nyour_text\n</pre>\n">' + this.lang.get("add_pre") + '</button>' +
+			'</div></div>');
+		component_arr.push('<div class="tools-group-panel"><button class="bt tools-group-bt">' + this.lang.get("add_h") + '</button><div class="tools-group">' +
+			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h1>\nyour_text\n</h1>\n">' + this.lang.get("add_h1") + '</button>' +
+			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h2>\nyour_text\n</h2>\n">' + this.lang.get("add_h2") + '</button>' +
+			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h3>\nyour_text\n</h3>\n">' + this.lang.get("add_h3") + '</button>' +
+			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h4>\nyour_text\n</h4>\n">' + this.lang.get("add_h4") + '</button>' +
+			'</div></div>');
+
+		component_arr.push('<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<ul>\n<li>\nyour_text\n</li>\n</ul>\n">' + this.lang.get("add_ul") + '</button>');
+		component_arr.push('<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<a href=\'your_url\'>\nyour_text\n</a>\n">' + this.lang.get("add_link") + '</button>');
+		component_arr.push('<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<img src=\'your_img_url\' width=\'200\' height=\'200\'>\n">' + this.lang.get("add_img") + '</button>');
+
 		component_arr.push('<div class="tools-error"></div>');
 		
 		
@@ -345,6 +379,7 @@ class LiveEditorLang{
 		const _l = [];		
 		_l["change_dir"] = "Dir";
 		_l["add_br"] = "Br";
+		_l["add_h"] = "H";
 		_l["add_h1"] = "H1";
 		_l["add_h2"] = "H2";
 		_l["add_h3"] = "H3";
@@ -355,6 +390,7 @@ class LiveEditorLang{
 		_l["add_link"] = "link";
 		_l["add_pre"] = "Pre";
 		_l["add_ul"] = "Ul";
+		_l["format"] = "Format";
 		
 		this.arr["en"] = _l;
 	}	
@@ -363,6 +399,7 @@ class LiveEditorLang{
 		const _l = [];
 		_l["change_dir"] = "Dir";
 		_l["add_br"] = "Br";
+		_l["add_h"] = "H";
 		_l["add_h1"] = "H1";
 		_l["add_h2"] = "H2";
 		_l["add_h3"] = "H3";
@@ -373,6 +410,7 @@ class LiveEditorLang{
 		_l["add_link"] = "link";
 		_l["add_pre"] = "Pre";
 		_l["add_ul"] = "Ul";
+		_l["format"] = "Format";
 
 		this.arr["fa"] = _l;
 	}		
