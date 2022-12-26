@@ -2,40 +2,40 @@ $( document ).ready(function() {
 	$.fn.LiveEditor = function(config){
 		this.each(function(index){
 			let newLiveEditor = new LiveEditorClass($(this),index,config);
-		});    
+		});
 	};
 
 	$.fn.extend({
 		insertAtCaret: function(myValue) {
-		this.each(function() {
-			if (document.selection) {
-			this.focus();
-			var sel = document.selection.createRange();
-			sel.text = myValue;
-			this.focus();
-			} else if (this.selectionStart || this.selectionStart == '0') {
-			var startPos = this.selectionStart;
-			var endPos = this.selectionEnd;
-			var scrollTop = this.scrollTop;
-			this.value = this.value.substring(0, startPos) +
-				myValue + this.value.substring(endPos,this.value.length);
-			this.focus();
-			this.selectionStart = startPos + myValue.length;
-			this.selectionEnd = startPos + myValue.length;
-			this.scrollTop = scrollTop;
-			} else {
-			this.value += myValue;
-			this.focus();
-			}
-		});
-		return this;
+			this.each(function() {
+				if (document.selection) {
+					this.focus();
+					var sel = document.selection.createRange();
+					sel.text = myValue;
+					this.focus();
+				} else if (this.selectionStart || this.selectionStart == '0') {
+					var startPos = this.selectionStart;
+					var endPos = this.selectionEnd;
+					var scrollTop = this.scrollTop;
+					this.value = this.value.substring(0, startPos) +
+						myValue + this.value.substring(endPos,this.value.length);
+					this.focus();
+					this.selectionStart = startPos + myValue.length;
+					this.selectionEnd = startPos + myValue.length;
+					this.scrollTop = scrollTop;
+				} else {
+					this.value += myValue;
+					this.focus();
+				}
+			});
+			return this;
 		}
 	});
 
 	$(document).on('click', 'button.tools-insert-code', function () {
 		let mainObj = $(this).data("mainObj");
 		let appendData = $(this).data("appendData");
-		let le_config = $("." + mainObj + " .liveeditor").data('config');;
+		let le_config = $("." + mainObj + " .liveeditor").data('config');
 		//console.log(le_config);
 		//console.log($("." + mainObj + " .liveeditor").val());
 		let your_img_url = $("." + mainObj + " .liveeditor-tools input[name='image']").val();
@@ -48,10 +48,10 @@ $( document ).ready(function() {
 		if(your_url != undefined && your_url != ''){
 			console.log(your_url);
 			appendData = appendData.replace("your_url",your_url);
-		}		
+		}
 
 		$("." + mainObj + " .liveeditor").insertAtCaret(appendData)
-	});	
+	});
 	$(document).on('click', 'button.tools-change-direction', function () {
 		let mainObj = $(this).data("mainObj");
 		let objText = $("." + mainObj + " .liveeditor");
@@ -60,11 +60,80 @@ $( document ).ready(function() {
 			objText.removeClass("ltr-direction");
 		}else{
 			objText.addClass("ltr-direction");
-			objText.removeClass("rtl-direction");			
+			objText.removeClass("rtl-direction");
 		}
-		
+
 	});
 
+	$(document).on('click', 'button.tools-draft', function () {
+		$(".restore-modal").remove();
+		let mainObj = $(this).data("mainObj");
+		let objText = $("." + mainObj + " .liveeditor");
+		let draft_url = $("." + mainObj + " .liveeditor").attr('draft_url');
+		//console.log(objText.val());
+		let andPosition = draft_url.search("&");
+		if(andPosition > 0)
+			draft_url = draft_url + "&type=save"
+		else
+			draft_url = draft_url + "?type=save"
+
+		let settings = {
+			"url": draft_url,
+			"method": "POST",
+			"timeout": 0,
+			"headers": {
+				"Content-Type": "text/plain"
+			},
+			"data": objText.val(),
+		};
+
+		$.ajax(settings).done(function (response) {
+			console.log("res...")
+			console.log(response);
+			alert(response['message']);
+		});
+	});
+
+	$(document).on('click', 'button.tools-restore', function () {
+		$(".restore-modal").remove();
+		let mainObj = $(this).data("mainObj");
+		let objText = $("." + mainObj + " .liveeditor");
+		let draft_url = $("." + mainObj + " .liveeditor").attr('draft_url');
+		let andPosition = draft_url.search("&");
+		if(andPosition > 0)
+			draft_url = draft_url + "&type=load"
+		else
+			draft_url = draft_url + "?type=load"
+
+		let parent_obj = $(this).parent();
+		let settings = {
+			"url": draft_url,
+			"method": "GET",
+			"timeout": 0,
+			"headers": {
+				"Content-Type": "text/plain"
+			},
+			"data": "",
+		};
+
+		$.ajax(settings).done(function (response) {
+			let json_data = response;
+
+			let modalHtml = '<div class="restore-modal"><ul>';
+			for(let i=0;i<json_data.length;i++){
+				modalHtml += '<li><button type="button" class="restore-action" data-main-obj="' + mainObj + '"  data-append-data="' + json_data[i].content + '">' + json_data[i].set_date + '</button></li>';
+			}
+			modalHtml += '</ul></div>';
+			parent_obj.append(modalHtml);
+		});
+
+	});
+
+	$(document).on('click', 'button.restore-action', function () {
+		let mainObj = $(this).data("mainObj");
+		let appendData = $(this).data("appendData");
+		$("." + mainObj + " .liveeditor").val(appendData);
+	});
 
 	$(document).on('mouseenter', 'button.tools-group-bt', function() {
 		//console.log('enter');
@@ -76,13 +145,13 @@ $( document ).ready(function() {
 		$('.tools-group').hide();
 	});
 
-	
+
 });
 
 
 class LiveEditorClass{
 	constructor(_obj,_index,_config){
-		
+
 		this.obj = _obj
 		this.keyword_input = null;
 		this.wrap_obj_name = 'lv' + _index + '-' + Math.floor(Math.random() * 10000);
@@ -106,7 +175,7 @@ class LiveEditorClass{
 		this.config = { ...configDefault, ..._config }
 		//console.log(this.config);
 	}
-	
+
 	init(){
 		this.old = '';
 
@@ -115,23 +184,35 @@ class LiveEditorClass{
 		this.obj.addClass("liveeditor");
 		this.obj.wrap('<div class="liveeditor-wrap ' + this.wrap_obj_name + '"></div>');
 		this.obj.wrap('<div class="liveeditor-box"></div>');
-		this.obj.parent().append("<iframe class='liveeditor-preview' id='p" + this.wrap_obj_name + "'></iframe>");	
-		$('.' + this.wrap_obj_name).prepend("<div class='liveeditor-tools'>" + this.getToolsBox() + "</div>");	
+		this.obj.parent().append("<iframe class='liveeditor-preview' id='p" + this.wrap_obj_name + "'></iframe>");
+
+		let draft_url_temp = $("." + this.wrap_obj_name + " .liveeditor").attr("draft_url");
+		if (typeof draft_url_temp !== 'undefined' && draft_url_temp !== false && draft_url_temp.length > 10) {
+			this.draft_url = draft_url_temp;
+		}else{
+			this.draft_url = false;
+		}
+
+		$('.' + this.wrap_obj_name).prepend("<div class='liveeditor-tools'>" + this.getToolsBox() + "</div>");
 		this.obj.data('config', this.config);
 		//this.addIframeHead();
 		let keyword_input_attr = this.obj.attr('keyword-input');
 		if(keyword_input_attr){
 			this.keyword_input = $(keyword_input_attr);
 		}
+
+
+
+
 		this.update();
 	}
-	
+
 	update(){
 
 		if (this.old != this.obj.val()) {
 			this.old = this.obj.val();
 			//this.preview_obj.contents().append(this.old);
-			
+
 			var $iframe = $('#p' + this.wrap_obj_name);
 			var $oldVar = this.old;
 			var checkValidate = this.validator.validate($oldVar);
@@ -149,45 +230,45 @@ class LiveEditorClass{
 			}
 			let keyword_report = this.getKeywordMetaInfo($oldVar);
 			var html_string = "<!DOCTYPE html><html><head><meta data-n-head='1' data-hid='charset' charset='utf-8'><meta data-n-head='1' name='viewport' content='width=device-width, initial-scale=1'><script>function getScrollPos(){return (window.pageYOffset);}</script>" + this.config.preview_head_additional_code + "</head><body onLoad='window.scrollTo(0," + scr_pos + ")'>" + keyword_report + $oldVar  + "</body></html>";
-			
+
 			obj_iframe.srcdoc = html_string;
 
-			
+
 		}
-		
+
 		setTimeout(() => {this.update();}, this.config.preview_refresh_rate);
 	}
 
 	getIframeWindow(iframe_object) {
 		var doc;
-	  
+
 		if (iframe_object.contentWindow) {
-		  return iframe_object.contentWindow;
+			return iframe_object.contentWindow;
 		}
-	  
+
 		if (iframe_object.window) {
-		  return iframe_object.window;
-		} 
-	  
+			return iframe_object.window;
+		}
+
 		if (!doc && iframe_object.contentDocument) {
-		  doc = iframe_object.contentDocument;
-		} 
-	  
+			doc = iframe_object.contentDocument;
+		}
+
 		if (!doc && iframe_object.document) {
-		  doc = iframe_object.document;
+			doc = iframe_object.document;
 		}
-	  
+
 		if (doc && doc.defaultView) {
-		 return doc.defaultView;
+			return doc.defaultView;
 		}
-	  
+
 		if (doc && doc.parentWindow) {
-		  return doc.parentWindow;
+			return doc.parentWindow;
 		}
-	  
+
 		return undefined;
-	}	
-	
+	}
+
 	addCSS(){
 		if($("style[data-n-head=25626548]")[0]) return;
 		let cssCode = '';
@@ -249,11 +330,46 @@ class LiveEditorClass{
 			margin: auto 5px;
 			min-width: 100px;
 			padding: 5px;
+			z-index:12;
 		}`;
 		cssCode += `.liveeditor-wrap .tools-group-panel {
 			display:inline-block;
 		}`;
-
+		cssCode += `.liveeditor-wrap .restore-modal ul {
+			display: block;
+			margin: 0;
+			padding: 0;
+			margin-top:10px;
+		}
+		.liveeditor-wrap .restore-modal li {
+			display: block;
+			margin: 0;
+			padding: 0;
+		}	
+		.liveeditor-wrap .restore-modal button {
+			border-width: 1px;
+			color: #ffffff;
+			cursor: pointer;
+			justify-content: center;
+			padding-bottom: calc(.5em - 1px);
+			padding-left: 1em;
+			padding-right: 1em;
+			padding-top: calc(.5em - 1px);
+			text-align: center;
+			white-space: nowrap;
+			background-color: #17a2b8;
+			border-color: transparent;
+			line-height: 1.5;
+			position: relative;
+			display: inline-flex;
+			box-shadow: none;
+			border-radius: .375em;
+			border: 1px solid transparent;
+			-webkit-appearance: none;	
+			margin-left:5px;
+			margin-top:5px;
+		}				
+		`;
 
 		cssCode += '</style>';
 		document.head.innerHTML += cssCode;
@@ -261,41 +377,49 @@ class LiveEditorClass{
 
 
 	getToolsBox(){
-		var component_arr = [];
-		
-		component_arr.push('<button  class="bt tools-change-direction" data-main-obj="' + this.wrap_obj_name + '">' + this.lang.get("change_dir") + '</button>');
-		component_arr.push('<div class="tools-group-panel"><button class="bt tools-group-bt">' + this.lang.get("format") + '</button><div class="tools-group">' +
-			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<br>\n">' + this.lang.get("add_br") + '</button>' +
-			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<p>\nyour_text\n</p>\n">' + this.lang.get("add_p") + '</button>' +
-			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<b>\nyour_text\n</b>\n">' + this.lang.get("add_b") + '</button>' +
-			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<pre>\nyour_text\n</pre>\n">' + this.lang.get("add_pre") + '</button>' +
+		let component_arr = [];
+
+		component_arr.push('<button type="button"  class="bt tools-change-direction" data-main-obj="' + this.wrap_obj_name + '">' + this.lang.get("change_dir") + '</button>');
+		component_arr.push('<div class="tools-group-panel"><button type="button" class="bt tools-group-bt">' + this.lang.get("format") + '</button><div class="tools-group">' +
+			'<button type="button"  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<br>\n">' + this.lang.get("add_br") + '</button>' +
+			'<button type="button"  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<p>\nyour_text\n</p>\n">' + this.lang.get("add_p") + '</button>' +
+			'<button type="button"  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<b>\nyour_text\n</b>\n">' + this.lang.get("add_b") + '</button>' +
+			'<button type="button"  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<pre>\nyour_text\n</pre>\n">' + this.lang.get("add_pre") + '</button>' +
 			'</div></div>');
-		component_arr.push('<div class="tools-group-panel"><button class="bt tools-group-bt">' + this.lang.get("add_h") + '</button><div class="tools-group">' +
-			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h1>\nyour_text\n</h1>\n">' + this.lang.get("add_h1") + '</button>' +
-			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h2>\nyour_text\n</h2>\n">' + this.lang.get("add_h2") + '</button>' +
-			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h3>\nyour_text\n</h3>\n">' + this.lang.get("add_h3") + '</button>' +
-			'<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h4>\nyour_text\n</h4>\n">' + this.lang.get("add_h4") + '</button>' +
+		component_arr.push('<div class="tools-group-panel"><button type="button" class="bt tools-group-bt">' + this.lang.get("add_h") + '</button><div class="tools-group">' +
+			'<button type="button"  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h1>\nyour_text\n</h1>\n">' + this.lang.get("add_h1") + '</button>' +
+			'<button type="button"  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h2>\nyour_text\n</h2>\n">' + this.lang.get("add_h2") + '</button>' +
+			'<button type="button"  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h3>\nyour_text\n</h3>\n">' + this.lang.get("add_h3") + '</button>' +
+			'<button type="button"  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<h4>\nyour_text\n</h4>\n">' + this.lang.get("add_h4") + '</button>' +
 			'</div></div>');
 
-		component_arr.push('<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<ul>\n<li>\nyour_text\n</li>\n</ul>\n">' + this.lang.get("add_ul") + '</button>');
-		component_arr.push('<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<a href=\'your_url\'>\nyour_text\n</a>\n">' + this.lang.get("add_link") + '</button>');
-		component_arr.push('<button  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<img src=\'your_img_url\' width=\'200\' height=\'200\'>\n">' + this.lang.get("add_img") + '</button>');
+		component_arr.push('<button type="button"  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<ul>\n<li>\nyour_text\n</li>\n</ul>\n">' + this.lang.get("add_ul") + '</button>');
+		component_arr.push('<button type="button"  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<a href=\'your_url\'>\nyour_text\n</a>\n">' + this.lang.get("add_link") + '</button>');
+		component_arr.push('<button type="button"  class="bt tools-insert-code" data-main-obj="' + this.wrap_obj_name + '" data-append-data="\n<img src=\'your_img_url\' width=\'200\' height=\'200\'>\n">' + this.lang.get("add_img") + '</button>');
+		if(this.draft_url){
+			component_arr.push('<div class="tools-group-panel"><button type="button" class="bt tools-group-bt">' + this.lang.get("draft") + '</button><div class="tools-group">' +
+				'<button type="button"  class="bt tools-draft" data-main-obj="' + this.wrap_obj_name + '" >' + this.lang.get("draft") + '</button>' +
+				'<button type="button"  class="bt tools-restore" data-main-obj="' + this.wrap_obj_name + '" >' + this.lang.get("restore") + '</button>' +
+				'</div></div>');
+		}
 
-		component_arr.push('<div class="tools-error"></div>');
-		
-		
+
+
 		for (let j = 0; j < this.config.additional_tools.length; j++) {
 			let add_tool = this.config.additional_tools[j];
 			let add_tool_obj = add_tool.obj;
 			add_tool_obj = add_tool_obj.replace("wrap_obj_name",this.wrap_obj_name);
 			component_arr.splice(add_tool.index, 0, add_tool_obj);
 		}
+		component_arr.push('<div class="tools-error"></div>');
 
-		var html = '';
+
+
+		let html = '';
 		for (let i = 0; i < component_arr.length; i++) {
 			html += component_arr[i];
-		}		
-		
+		}
+
 		return html;
 	}
 
@@ -303,19 +427,19 @@ class LiveEditorClass{
 		var tab = '\t';
 		var result = '';
 		var indent= '';
-	
+
 		html.split(/>\s*</).forEach(function(element) {
 			if (element.match( /^\/\w/ )) {
 				indent = indent.substring(tab.length);
 			}
-	
+
 			result += indent + '<' + element + '>\r\n';
-	
-			if (element.match( /^<?\w[^>]*[^\/]$/ ) && !element.startsWith("input")  ) { 
-				indent += tab;              
+
+			if (element.match( /^<?\w[^>]*[^\/]$/ ) && !element.startsWith("input")  ) {
+				indent += tab;
 			}
 		});
-	
+
 		return result.substring(1, result.length-3);
 	}
 
@@ -352,7 +476,7 @@ class LiveEditorClass{
 		html += '</div>';
 		return html;
 	}
-	
+
 }
 
 class LiveEditorLang{
@@ -371,12 +495,12 @@ class LiveEditorLang{
 		let translated = this.arr[this.lang][key];
 		if(translated != undefined)
 			return translated;
-		else 
+		else
 			return key;
 	}
 
 	init_en(){
-		const _l = [];		
+		const _l = [];
 		_l["change_dir"] = "Dir";
 		_l["add_br"] = "Br";
 		_l["add_h"] = "H";
@@ -391,9 +515,11 @@ class LiveEditorLang{
 		_l["add_pre"] = "Pre";
 		_l["add_ul"] = "Ul";
 		_l["format"] = "Format";
-		
+		_l["draft"] = "Draft";
+		_l["restore"] = "Restore";
+
 		this.arr["en"] = _l;
-	}	
+	}
 
 	init_fa(){
 		const _l = [];
@@ -411,15 +537,17 @@ class LiveEditorLang{
 		_l["add_pre"] = "Pre";
 		_l["add_ul"] = "Ul";
 		_l["format"] = "Format";
+		_l["draft"] = "Draft";
+		_l["restore"] = "Restore";
 
 		this.arr["fa"] = _l;
-	}		
+	}
 }
 
 class LiveEditorValidator{
 	constructor(){
 		this.error = '';
-	}	
+	}
 
 	validate(content){
 		if(content.trim() == '' || !this.isHtml(content.trim())){
@@ -441,7 +569,7 @@ class LiveEditorValidator{
 
 	isHtml(input) {
 		return /<[a-z]+\d?(\s+[\w-]+=("[^"]*"|'[^']*'))*\s*\/?>|&#?\w+;/i.test(input);
-	}	
+	}
 
 	validHTML(html) { // checks the validity of html, requires all tags and property-names to only use alphabetical characters and numbers (and hyphens, underscore for properties)
 		html = html.toLowerCase().replace(/(?<=<[^>]+?=\s*"[^"]*)[<>]/g,"").replace(/(?<=<[^>]+?=\s*'[^']*)[<>]/g,""); // remove all angle brackets from tag properties
@@ -495,13 +623,13 @@ class LiveEditorValidator{
 			}
 		}
 		return true;
-	}	
+	}
 
 	checkHTML(html) {
 		var doc = document.createElement('div');
 		doc.innerHTML = html;
 		return ( doc.innerHTML === html );
-	}	
+	}
 
 	findEmptyTags(str){
 		const regex = /<([^>]+)\s*([^>]*)>\s*<\/\1\s*>/gm;
@@ -515,16 +643,16 @@ class LiveEditorValidator{
 			if (m.index === regex.lastIndex) {
 				regex.lastIndex++;
 			}
-			
+
 			// The result can be accessed through the `m`-variable.
 			m.forEach((match, groupIndex) => {
 				//console.log(groupIndex + " " + match);
 				if(groupIndex == 0){
 					$res_error = match;
 					$res_finded = true;
-				}  
+				}
 			});
-		}		
+		}
 
 		this.error = "Empty Tag: " + $res_error;
 		return $res_finded;
