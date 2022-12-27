@@ -88,9 +88,10 @@ $( document ).ready(function() {
 		};
 
 		$.ajax(settings).done(function (response) {
-			console.log("res...")
-			console.log(response);
-			alert(response['message']);
+			if(response['message'] != '')
+				$.fn.toast(response['message']);
+		}).fail(function() {
+			$.fn.toast('Error in draft saving!');
 		});
 	});
 
@@ -125,6 +126,8 @@ $( document ).ready(function() {
 			}
 			modalHtml += '</ul></div>';
 			parent_obj.append(modalHtml);
+		}).fail(function() {
+			$.fn.toast('Error in draft loading!');
 		});
 
 	});
@@ -145,6 +148,17 @@ $( document ).ready(function() {
 		$('.tools-group').hide();
 	});
 
+	$.fn.toast = function(msg) {
+		$("#snackbar").remove();
+		$("body").append('<div id="snackbar">' + msg + '</div>');
+		$("#snackbar").addClass("show");
+		setTimeout(function(){ $("#snackbar").removeClass("show"); }, 3000);
+	}
+
+	setInterval(function(){
+		console.log('interval called!' + (new Date()));
+		$("button.tools-draft").trigger('click');
+	}, 300000);
 
 });
 
@@ -155,6 +169,7 @@ class LiveEditorClass{
 		this.obj = _obj
 		this.keyword_input = null;
 		this.wrap_obj_name = 'lv' + _index + '-' + Math.floor(Math.random() * 10000);
+
 
 		this.initConfig(_config);
 		this.lang = new LiveEditorLang(this.config.language)
@@ -370,6 +385,49 @@ class LiveEditorClass{
 			margin-top:5px;
 		}				
 		`;
+		cssCode += `
+			#snackbar {
+			  visibility: hidden;
+			  min-width: 250px;
+			  background-color: #2196f3;
+			  color: #fff;
+			  text-align: center;
+			  border-radius: 2px;
+			  padding: 16px;
+			  position: fixed;
+			  z-index: 1000;
+			  
+			  bottom: 30px;
+			  font-size: 17px;
+			  border-radius: 5px;
+			}
+			
+			#snackbar.show {
+			  visibility: visible;
+			  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+			  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+			}
+			
+			@-webkit-keyframes fadein {
+			  from {bottom: 0; opacity: 0;} 
+			  to {bottom: 30px; opacity: 1;}
+			}
+			
+			@keyframes fadein {
+			  from {bottom: 0; opacity: 0;}
+			  to {bottom: 30px; opacity: 1;}
+			}
+			
+			@-webkit-keyframes fadeout {
+			  from {bottom: 30px; opacity: 1;} 
+			  to {bottom: 0; opacity: 0;}
+			}
+			
+			@keyframes fadeout {
+			  from {bottom: 30px; opacity: 1;}
+			  to {bottom: 0; opacity: 0;}
+			}		
+		`;
 
 		cssCode += '</style>';
 		document.head.innerHTML += cssCode;
@@ -473,6 +531,7 @@ class LiveEditorClass{
 			}
 
 		}
+
 		html += '</div>';
 		return html;
 	}
